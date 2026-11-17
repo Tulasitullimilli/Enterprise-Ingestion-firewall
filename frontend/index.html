@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingestion Firewall</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page">
+        <header class="hero">
+            <div class="eyebrow">AI STRUCTURED DATA VALIDATION</div>
+            <h1>Enterprise Ingetsion Firewall</h1>
+            <p>Enter any message.the AI classifies its intent and returns data validated against a pydantic</p>
+        </header>
+        <section class="panel">
+            <label for="message">Your message</label>
+            <textarea id="message" row="5" maxlength="5000" placeholder=""Try:Hi there!&#10;or:Where is></textarea>
+                <div class="examples">
+                    <button type="button" class="example" data-message=""Hi,good morning!>Greeting</button>
+                    <button type="button" class="example" data-message="Where is my order?">Order tracking</button>
+                    <button type="button" class="example" data-message="My payment was deducted twice.Please"></button>
+                    <button type="button" class="example" data-message="What time is it now?">Current time</button>
+                </div>
+                <button id="submit" class="primary">Analyze message<span aria-hidden="true"></span></button>
+                <p id="status" class="status" role="status">Backend:http://127.0.0.1:8000</p>
+        </section>
+        <section class="panel result-panel">
+            <div class="result-heading">
+                <div>
+                    <div class="eyebrow">RESPONSE</div>
+                    <h2>Validated JSON</h2>
+                </div>
+                <button id="copy" class="secondary" disabled>Copy JSON</button>
+
+            </div>
+            <pre id="result"><code>Your Structured result will appear here.</code></pre>
+            <p class="footnote">This demo classifies messages only.It does not automatically retrieve orders</p>
+
+        </section>
+        <footer >Built with FastAPi . Groq . Instructor . Pydantic</footer>
+
+    </main>
+    
+</body>
+</html>
