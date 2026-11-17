@@ -6,6 +6,9 @@ from app.schemas.ingestion import IngestionRequest, IngestionResult
 from app.services.llm_services import analyze_message
 from app.utils.token_counter import estimate_tokens
 
+from app.schemas.assistant import AssistantResult
+from app.services.response_servise import generate_response
+
 app=FastAPI(
     title="Enterprise Structured Ingestion firewall",
     description="Classifies user messages and validates structures AI output.",
@@ -25,14 +28,25 @@ app.add_middleware(
 def health_check():
     return {"status":"ok","message":"Ingestion Firewall API is running"}
 
-@app.post("/api/analyze", response_model=IngestionResult)
+@app.post("/api/analyze", response_model=AssistantResult)
 def analyze(request:IngestionRequest):
-    message = request.message
+    message = request.message.strip()
+    if not message:
+        raise HTTPException(status_code=422,detail="Message cannot be empty")
     
     try:
+        #week-1:Detect user intent
         result=analyze_message(message)
         result.token_metadata.estimated_input_tokens = estimate_tokens(message)
-        return result
+        #week-2
+        response_markdown = generate_response(result)
+
+        return AssistantResult(
+            **result.model_dump(),
+            response_markdown=response_markdown,
+        )
+
+    
     except ValidationError as exc:
         raise HTTPException(
             status_code=502,
@@ -41,6 +55,8 @@ def analyze(request:IngestionRequest):
                 "validation_errors":exc.errors(),
             },
         ) from exc
+
+    
     except Exception as exc:
         raise HTTPException(
             status_code=502,
