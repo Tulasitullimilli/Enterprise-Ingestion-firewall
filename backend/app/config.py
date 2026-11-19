@@ -9,5 +9,8 @@ load_dotenv()
 
 GROQ_API_KEY=os.getenv("GROQ_API_KEY","").strip()
 GROQ_MODEL=os.getenv("GROQ_MODEL","").strip()
+DATABASE_URL=os.getenv("DATABASE_URL","").strip()
+
+
 
 

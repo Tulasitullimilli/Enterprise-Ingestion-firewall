@@ -15,12 +15,20 @@ Priority = Literal["low", "medium", "high"]
 class IngestionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    session_id:str | None =Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        description="optional conversation session identifier"
+    )
+
     message: str = Field(
         min_length=1,
         max_length=5000,
         description="The user original message",
         examples=["where is my order?"]
     )
+    
 
     @field_validator("message")
     @classmethod
