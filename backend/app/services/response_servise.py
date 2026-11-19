@@ -24,7 +24,9 @@ Rules:
 -Return only the Markdown answer,without JSON.
 """.strip()
 
-def generate_response(intent_result: IngestionResult) -> str:
+def generate_response(intent_result: IngestionResult,history:list[dict[str,str]]
+                      |None =None,
+                      current_message:str|None=None) -> str:
     if not GROQ_API_KEY:
         raise RuntimeError(
             "GROQ_API_KEY is missing. Add it to backend/.env before using the LLM"
@@ -38,26 +40,27 @@ def generate_response(intent_result: IngestionResult) -> str:
         "requires_action": intent_result.requires_action,
     }
 
+    message=[{
+        "role":"system","content":RESPONSE_SYSTEM_PROMPT}]
+    message.extend(history or [])
+    message.append({
+        "role":"user",
+        "content":(
+            "current message:\n"
+            f"{current_message or intent_result.summary}\n\n"
+            "current intent analysis (json):\n"
+            f"{json.dumps(intent_context,ensure_ascii=False)}"
+        ),
+
+    })
+
     client = Groq(api_key=GROQ_API_KEY)
     completion = client.chat.completions.create(
         model=GROQ_MODEL,
         temperature=0.3,
         max_tokens=1000,
-        messages=[
-            {
-                "role": "system",
-                "content": RESPONSE_SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": (
-                    "Create a helpful Markdown response using this intent analysis:\n"
-                    f"{json.dumps(intent_context, ensure_ascii=False)}"
-                ),
-            },
-        ],
+        messages=message,
     )
-
     answer = completion.choices[0].message.content
     if not answer or not answer.strip():
         raise ValueError("The LLM returned an empty response")
